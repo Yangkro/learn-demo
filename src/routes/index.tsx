@@ -1,4 +1,26 @@
+import { Outlet, Link, Form, useLoaderData } from 'react-router-dom'
+import { createContact, getContact } from '../constants'
+import { contactTypes } from './contact'
+export async function action() {
+    const contacts = await createContact()
+    return { contacts }
+}
+
+export async function loader() {
+    const contacts = await getContact()
+    return { contacts }
+}
+
 export default function Root(){
+    // const { contacts } = useLoaderData() as { contacts: Array<contactTypes>}
+    const contacts=[{
+        first: "Your",
+        last: "name",
+        avatar: "https://placekitten.com/g/200/200",
+        twitter:"Yangkro",
+        notes: "web developer",
+        favorite: true,
+    }]
     return (
         <>
             <div id="sidebar">
@@ -24,18 +46,45 @@ export default function Root(){
                         >
                         </div>
                     </form>
-                    <form method="post">
+                    <Form method="post">
                         <button type="submit">New</button>
-                    </form>
+                    </Form>
                 </div>
                 <nav>
-                    <ul>
-                        <li><a href={`contacts/1`}>Your Name</a></li>
-                        <li><a href={`contacts/2`}>Your Friends</a></li>
-                    </ul>
+                    {
+                       contacts.length ? (
+                        <ul>
+                            {
+                                contacts.map((contact:any)=>{
+                                    return (
+                                        <li>
+                                        <Link to={`contacts/${contact.id}`}>
+                                            {
+                                                contact.first || contact.last ? (
+                                                    <>
+                                                        { contact.first } { contact.last }
+                                                    </>
+                                                ):(
+                                                    <i>No Name</i>
+                                                )
+                                            }{ " " }
+                                        </Link>
+                                    </li>
+                                    )
+                                })
+                            }
+                        </ul>
+                       ) :(
+                        <p>
+                            <i>No contacts</i>
+                        </p>
+                       )
+                    }
                 </nav>
             </div>
-            <div id="detail"></div>
+            <div id="detail">
+                <Outlet />
+            </div>
         </>
     )
 }
